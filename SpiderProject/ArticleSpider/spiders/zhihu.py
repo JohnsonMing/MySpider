@@ -31,6 +31,7 @@ class ZhihuSpider(scrapy.Spider):
         if match_obj:
             xsrf = (match_obj.group(1))
 
+
         post_url = "https://www.zhihu.com/login/phone_num"
         post_data = {
             "_xsrf": xsrf,
