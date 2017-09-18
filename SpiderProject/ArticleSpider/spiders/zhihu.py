@@ -61,7 +61,23 @@ class ZhihuSpider(scrapy.Spider):
 
         else:
             # 处理知乎旧版本
-            pass
+            match_obj = re.match("(.*zhihu.com/question/(\d+))(/|$).*", response.url)
+            if match_obj:
+                question_id = int(match_obj.group(2))
+
+            item_loader = ItemLoader(item=ZhihuQuestionItem(), response=response)
+            item_loader.add_css("title", ".zh-question-title h2 a::text")
+            item_loader.add_css("content", "#zh-question-detail")
+            item_loader.add_value("url", response.url)
+            item_loader.add_value("zhihu_id", question_id)
+            item_loader.add_css("answer_num", ".List-headerText span::text")
+            item_loader.add_css("comments_num", "#zh-question-meta-wrap a[name='addcomment']::text")
+            item_loader.add_css("watch_user_num", "#zh-question-side-header-wrap::text")
+            item_loader.add_css("topics", ".zm-tag-editor-labels a::text")
+
+            question_item = item_loader.load_item()
+        pass
+
 
     def start_requests(self):
         return [scrapy.Request('https://www.zhihu.com/#signin', headers=self.headers, callback=self.login)]
